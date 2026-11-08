@@ -1,0 +1,21 @@
+# Project-level CodeMender Command Policy (.codemender/command_policy.yaml)
+# Merged automatically with ~/.codemender/command_policy.yaml on every cm run.
+# Blocks network exfiltration tools, privilege escalation, and destructive VCS commands.
+
+block:
+  - curl
+  - wget
+  - nc
+  - ncat
+  - ssh
+  - scp
+  - sudo
+  - su
+  - mkfs
+  - dd
+  - reboot
+  - shutdown
+
+block_patterns:
+  - '\bgit\s+(push|commit|rebase|reset\s+--hard)\b'
+  - '\brm\s+-[a-zA-Z]*r[a-zA-Z]*f\s+/\s*$'

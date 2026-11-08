@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.venv/
+.cm_project
+codemender.sarif
+gha-creds-*.json

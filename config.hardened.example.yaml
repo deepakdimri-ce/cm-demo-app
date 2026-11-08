@@ -1,0 +1,50 @@
+# Reference Hardened ~/.codemender/config.yaml for Live Demos & Developer Workstations
+# Copy to ~/.codemender/config.yaml after running `cm init` (adjust project_paths if needed).
+
+server: {}
+
+team_id: "ce-security-demo"
+
+scan:
+  extensions:
+    # Scope scan strictly to Python source for a fast, deterministic demo:
+    include: [".py"]
+    exclude: [".min.js", ".generated.go", ".pb.go"]
+  # Skip test & helper scripts if you want `cm find .` to focus only on production code,
+  # or scan `./src` directly (`cm find ./src --quick`).
+  exclude_dirs: ["node_modules", "vendor", "dist", "/target", "/obj", "/build", ".gradle", ".venv", "__pycache__"]
+  max_file_size_kb: 2048
+  incremental: true
+
+output:
+  format: table
+
+tools:
+  # Human-in-the-loop guardrails on developer laptops (override in CI with --yes):
+  confirm_commands: true
+  confirm_writes: true
+  cleanup_candidate_branches: true
+
+sandbox:
+  # OS-level isolation (Linux namespaces + seccomp / macOS Seatbelt):
+  enabled: true
+  mounts:
+    target_dir: "."
+  network:
+    # Complete outbound network block inside the sandbox during PoC & build runs:
+    profile: "permissive-closed"
+
+security:
+  # Mount sensitive host files & CI configs read-only inside the sandbox:
+  protected_files:
+    - "~/.ssh/*"
+    - "~/.config/gcloud/*"
+    - ".github/*"
+    - ".codemender/*"
+
+vcs:
+  type: "git"
+
+build:
+  # Runs 100% offline inside the permissive-closed sandbox to verify patches don't break tests:
+  command: "python3 -m unittest discover -s tests -v"

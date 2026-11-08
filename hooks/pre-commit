@@ -1,0 +1,9 @@
+#!/bin/sh
+# Security Gate 1: Local Git pre-commit hook
+# Enable with: cp hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+if ! cm find . --diff --staged --fail-on=CRITICAL,HIGH --yes --bypass-warning; then
+  echo "CodeMender blocked this commit due to CRITICAL/HIGH vulnerabilities in staged code." >&2
+  echo "Inspect findings with:  cm report --status=OPEN" >&2
+  echo "Emergency bypass:       git commit --no-verify" >&2
+  exit 1
+fi
