@@ -85,3 +85,15 @@ def get_invoice_by_id_safe(
         return cur.fetchone()
     finally:
         conn.close()
+
+def delete_invoice_by_email(db_path: str, tenant_id: str, customer_email: str) -> None:
+    """Deletes invoices matching a customer email for a tenant."""
+    conn = sqlite3.connect(db_path)
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            f"DELETE FROM invoices WHERE tenant_id = '{tenant_id}' AND customer_email = '{customer_email}'"
+        )
+        conn.commit()
+    finally:
+        conn.close()
