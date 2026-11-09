@@ -35,12 +35,14 @@ sandbox:
     profile: "permissive-closed"
 
 security:
-  # Mount sensitive host files & CI configs read-only inside the sandbox:
+  # Mount critical repo files read-only inside the sandbox during `cm fix`
+  # so the agent can never tamper with CI workflows, command policies, or unit tests!
+  # (Host credentials like ~/.config/gcloud, ~/.aws, ~/.kube, ~/.git-credentials
+  # and /var/run/docker.sock are ALREADY completely hidden/denied by exebox out of the box.)
   protected_files:
-    - "~/.ssh/*"
-    - "~/.config/gcloud/*"
     - ".github/*"
     - ".codemender/*"
+    - "tests/*"
 
 vcs:
   type: "git"
