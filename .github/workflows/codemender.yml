@@ -50,6 +50,7 @@ jobs:
       - name: Preflight & Diff Scan PR
         id: scan
         env:
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
           BASE_REF: ${{ github.base_ref }}
           FAIL_ON: CRITICAL,HIGH
         run: |
@@ -122,12 +123,15 @@ jobs:
           unzip -q -o "$RUNNER_TEMP/cm.zip" -d "$RUNNER_TEMP/cm"
           echo "$RUNNER_TEMP/cm" >> "$GITHUB_PATH"
 
-      - uses: actions/download-artifact@v4
+      - name: Install CodeMender Findings
+        uses: actions/download-artifact@v4
         with:
           name: codemender-findings
           path: ${{ runner.temp }}/codemender
 
       - name: Generate & Validate Patches
+        env:
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         run: |
           printf '%s\n' .cm_project 'gha-creds-*.json' >> .git/info/exclude
           cm init
