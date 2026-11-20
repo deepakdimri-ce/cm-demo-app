@@ -123,8 +123,7 @@ jobs:
           unzip -q -o "$RUNNER_TEMP/cm.zip" -d "$RUNNER_TEMP/cm"
           echo "$RUNNER_TEMP/cm" >> "$GITHUB_PATH"
 
-      - name: Install CodeMender Findings
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: codemender-findings
           path: ${{ runner.temp }}/codemender
@@ -135,7 +134,8 @@ jobs:
         run: |
           printf '%s\n' .cm_project 'gha-creds-*.json' >> .git/info/exclude
           cm init
-          printf 'project_paths:\n  - "%s"\nbuild:\n  command: "python3 -m unittest discover -s tests -v"\n' "$GITHUB_WORKSPACE" \
+          sed -i 's|^  command: ""|  command: "python3 -m unittest discover -s tests -v"|' ~/.codemender/config.yaml
+          printf 'project_paths:\n  - "%s"\n' "$GITHUB_WORKSPACE" \
             >> ~/.codemender/config.yaml
           cm report import -f "$RUNNER_TEMP/codemender/codemender-findings.json"
 
