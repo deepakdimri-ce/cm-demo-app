@@ -92,7 +92,8 @@ def delete_invoice_by_email(db_path: str, tenant_id: str, customer_email: str) -
     try:
         cur = conn.cursor()
         cur.execute(
-            f"DELETE FROM invoices WHERE tenant_id = '{tenant_id}' AND customer_email = '{customer_email}'"
+            "DELETE FROM invoices WHERE tenant_id = ? AND customer_email = ?",
+            (tenant_id, customer_email),
         )
         conn.commit()
     finally:
