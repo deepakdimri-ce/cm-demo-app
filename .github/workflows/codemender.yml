@@ -50,6 +50,7 @@ jobs:
       - name: Preflight & Diff Scan PR
         id: scan
         env:
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
           BASE_REF: ${{ github.base_ref }}
           FAIL_ON: CRITICAL,HIGH
         run: |
@@ -128,10 +129,13 @@ jobs:
           path: ${{ runner.temp }}/codemender
 
       - name: Generate & Validate Patches
+        env:
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         run: |
           printf '%s\n' .cm_project 'gha-creds-*.json' >> .git/info/exclude
           cm init
-          printf 'project_paths:\n  - "%s"\nbuild:\n  command: "python3 -m unittest discover -s tests -v"\n' "$GITHUB_WORKSPACE" \
+          sed -i 's|^  command: ""|  command: "python3 -m unittest discover -s tests -v"|' ~/.codemender/config.yaml
+          printf 'project_paths:\n  - "%s"\n' "$GITHUB_WORKSPACE" \
             >> ~/.codemender/config.yaml
           cm report import -f "$RUNNER_TEMP/codemender/codemender-findings.json"
 
